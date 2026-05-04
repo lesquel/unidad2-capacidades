@@ -4,9 +4,8 @@ Mini app móvil/web hecha con **React Native + Expo Router** que permite a estud
 
 ## Capacidades híbridas
 
-- **Cámara nativa** (Android/iOS) vía `expo-image-picker`
-- **Cámara web** real con `navigator.mediaDevices.getUserMedia` (overlay propio)
-- **Galería** cross-platform
+- **Cámara embebida** con `expo-camera` (`<CameraView>`) — preview en vivo dentro de la app, MISMO componente en mobile y web (en web usa `getUserMedia` por debajo)
+- **Galería** cross-platform vía `expo-image-picker`
 - **Persistencia** local con `@react-native-async-storage/async-storage` (localStorage en web, almacenamiento nativo en mobile)
 - **Layout responsive** con `maxWidth` centrado: en mobile llena la pantalla, en desktop queda en 600px centrados
 
@@ -16,7 +15,7 @@ Mini app móvil/web hecha con **React Native + Expo Router** que permite a estud
 - React Native 0.81 + React 19
 - Expo Router 6 (file-based routing)
 - TypeScript estricto
-- `expo-image-picker`, `@expo/vector-icons`, `@react-native-async-storage/async-storage`
+- `expo-camera`, `expo-image-picker`, `@expo/vector-icons`, `@react-native-async-storage/async-storage`
 
 ## Arquitectura
 
@@ -25,11 +24,11 @@ Separación por responsabilidad, no por capa:
 ```
 app/index.tsx                    Composición — solo dibuja el árbol
 hooks/use-evidencia.ts           Estado + acciones (lógica de negocio)
-lib/web-camera.ts                Side-effects DOM (web only): getUserMedia + overlay
 lib/evidencia-storage.ts         Capa de persistencia (AsyncStorage)
 constants/evidencia-theme.ts     Design tokens B&W
 components/evidencia/            Presentacionales puros
   ├── card.tsx                   Primitive reutilizable
+  ├── camera-modal.tsx           Overlay con CameraView (mobile + web)
   ├── evidencia-header.tsx
   ├── status-row.tsx + status-pill.tsx
   ├── capture-actions.tsx
@@ -70,4 +69,4 @@ Plus:
 - Persistencia local de evidencias guardadas (no se pierden al recargar)
 - Lista de evidencias guardadas con thumbnail, fecha y opción de eliminar
 - UI responsive (mobile + web desktop)
-- Cámara web real con `getUserMedia` (no solo file picker)
+- Cámara embebida con `<CameraView>` — mismo UX en mobile y web (preview en vivo + capturar)

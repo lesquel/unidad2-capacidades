@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-import { abrirCamaraWeb } from '@/lib/web-camera';
 import {
   EvidenciaGuardada,
   eliminarEvidencia as removeFromStorage,
@@ -19,10 +18,13 @@ export type EvidenciaState = {
   observacionMax: number;
   evidencias: EvidenciaGuardada[];
   cargandoLista: boolean;
+  cameraOpen: boolean;
 };
 
 export type EvidenciaActions = {
-  tomarFoto: () => Promise<void>;
+  abrirCamara: () => void;
+  cerrarCamara: () => void;
+  confirmarFoto: (uri: string) => void;
   seleccionarImagen: () => Promise<void>;
   quitarImagen: () => void;
   setObservacion: (texto: string) => void;
@@ -35,6 +37,7 @@ export function useEvidencia(): EvidenciaState & EvidenciaActions {
   const [observacion, setObservacionRaw] = useState('');
   const [evidencias, setEvidencias] = useState<EvidenciaGuardada[]>([]);
   const [cargandoLista, setCargandoLista] = useState(true);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   useEffect(() => {
     listarEvidencias()
@@ -42,32 +45,12 @@ export function useEvidencia(): EvidenciaState & EvidenciaActions {
       .finally(() => setCargandoLista(false));
   }, []);
 
-  const tomarFoto = useCallback(async () => {
-    if (Platform.OS === 'web') {
-      try {
-        abrirCamaraWeb(setImageUri);
-      } catch (e: any) {
-        Alert.alert('Error', String(e?.message ?? e));
-      }
-      return;
-    }
+  const abrirCamara = useCallback(() => setCameraOpen(true), []);
+  const cerrarCamara = useCallback(() => setCameraOpen(false), []);
 
-    try {
-      const permiso = await ImagePicker.requestCameraPermissionsAsync();
-      if (!permiso.granted) {
-        Alert.alert('Permiso denegado', 'Necesitamos acceso a la cámara.');
-        return;
-      }
-
-      const resultado = await ImagePicker.launchCameraAsync({
-        mediaTypes: 'images',
-        quality: 0.7,
-      });
-
-      if (!resultado.canceled) setImageUri(resultado.assets[0].uri);
-    } catch (e: any) {
-      Alert.alert('Error con la cámara', String(e?.message ?? e));
-    }
+  const confirmarFoto = useCallback((uri: string) => {
+    setImageUri(uri);
+    setCameraOpen(false);
   }, []);
 
   const seleccionarImagen = useCallback(async () => {
@@ -138,7 +121,10 @@ export function useEvidencia(): EvidenciaState & EvidenciaActions {
     observacionMax: OBSERVACION_MAX,
     evidencias,
     cargandoLista,
-    tomarFoto,
+    cameraOpen,
+    abrirCamara,
+    cerrarCamara,
+    confirmarFoto,
     seleccionarImagen,
     quitarImagen,
     setObservacion,

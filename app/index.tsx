@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 
+import { CameraModal } from '@/components/evidencia/camera-modal';
 import { CaptureActions } from '@/components/evidencia/capture-actions';
 import { EvidenciaHeader } from '@/components/evidencia/evidencia-header';
 import { ImagePreview } from '@/components/evidencia/image-preview';
@@ -41,7 +42,7 @@ export default function RegistroEvidenciaScreen() {
             />
 
             <CaptureActions
-              onTomarFoto={evidencia.tomarFoto}
+              onTomarFoto={evidencia.abrirCamara}
               onSeleccionarImagen={evidencia.seleccionarImagen}
             />
 
@@ -65,6 +66,12 @@ export default function RegistroEvidenciaScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <CameraModal
+        visible={evidencia.cameraOpen}
+        onClose={evidencia.cerrarCamara}
+        onCapture={evidencia.confirmarFoto}
+      />
     </View>
   );
 }
