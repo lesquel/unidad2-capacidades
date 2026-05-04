@@ -1,50 +1,73 @@
-# Welcome to your Expo app 👋
+# Registro de Evidencia Educativa
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mini app móvil/web hecha con **React Native + Expo Router** que permite a estudiantes registrar evidencia fotográfica de tareas, deberes o prácticas. Cada registro incluye una imagen (cámara o galería) y una observación, y se persiste localmente con `AsyncStorage`.
 
-## Get started
+## Capacidades híbridas
 
-1. Install dependencies
+- **Cámara nativa** (Android/iOS) vía `expo-image-picker`
+- **Cámara web** real con `navigator.mediaDevices.getUserMedia` (overlay propio)
+- **Galería** cross-platform
+- **Persistencia** local con `@react-native-async-storage/async-storage` (localStorage en web, almacenamiento nativo en mobile)
+- **Layout responsive** con `maxWidth` centrado: en mobile llena la pantalla, en desktop queda en 600px centrados
 
-   ```bash
-   npm install
-   ```
+## Stack
 
-2. Start the app
+- Expo SDK 54
+- React Native 0.81 + React 19
+- Expo Router 6 (file-based routing)
+- TypeScript estricto
+- `expo-image-picker`, `@expo/vector-icons`, `@react-native-async-storage/async-storage`
 
-   ```bash
-   npx expo start
-   ```
+## Arquitectura
 
-In the output, you'll find options to open the app in a
+Separación por responsabilidad, no por capa:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/index.tsx                    Composición — solo dibuja el árbol
+hooks/use-evidencia.ts           Estado + acciones (lógica de negocio)
+lib/web-camera.ts                Side-effects DOM (web only): getUserMedia + overlay
+lib/evidencia-storage.ts         Capa de persistencia (AsyncStorage)
+constants/evidencia-theme.ts     Design tokens B&W
+components/evidencia/            Presentacionales puros
+  ├── card.tsx                   Primitive reutilizable
+  ├── evidencia-header.tsx
+  ├── status-row.tsx + status-pill.tsx
+  ├── capture-actions.tsx
+  ├── image-preview.tsx
+  ├── observation-input.tsx
+  ├── save-button.tsx
+  └── saved-list.tsx
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Principios:
+- **Container/Presentational**: el hook tiene el estado, los componentes solo reciben props
+- **Side-effects aislados**: la manipulación de DOM y el storage viven en `lib/`, nunca dentro de un componente
+- **Single Responsibility**: cada archivo tiene un solo trabajo
+- **Tokens centralizados**: una sola paleta B&W, los componentes la consumen
 
-## Learn more
+## Cómo correr
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+bun install
+bun start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Después:
+- Apretá `w` para abrir en web
+- Escaneá el QR con Expo Go en el celular
+- Apretá `a` o `i` para emulador Android/iOS
 
-## Join the community
+## Rúbrica cumplida
 
-Join our community of developers creating universal apps.
+1. Abre sin errores en Expo Go ✓
+2. Selecciona imagen desde galería ✓
+3. Toma foto desde la cámara ✓
+4. Muestra la imagen capturada ✓
+5. Relacionada con un proyecto educativo ✓
+6. Campo de texto para observación con contador ✓
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Plus:
+- Persistencia local de evidencias guardadas (no se pierden al recargar)
+- Lista de evidencias guardadas con thumbnail, fecha y opción de eliminar
+- UI responsive (mobile + web desktop)
+- Cámara web real con `getUserMedia` (no solo file picker)
