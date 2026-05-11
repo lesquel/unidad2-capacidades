@@ -40,6 +40,15 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="sensores"
+          options={{
+            title: 'Sensores',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="pulse-outline" size={size} color={color} />
+            ),
+          }}
+        />
       </Tabs>
     </EvidenciaProvider>
   );
