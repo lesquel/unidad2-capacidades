@@ -3,15 +3,25 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { EVIDENCIA_COLORS } from '@/constants/evidencia-theme';
 import { Card } from './card';
+import { StatusPill } from './status-pill';
 
 type Props = {
   imageUri: string | null;
   onQuitar: () => void;
+  imagenLista: boolean;
 };
 
-export function ImagePreview({ imageUri, onQuitar }: Props) {
+export function ImagePreview({ imageUri, onQuitar, imagenLista }: Props) {
+  const estadoImagen = (
+    <StatusPill
+      icon={imagenLista ? 'checkmark-circle' : 'image-outline'}
+      label="Imagen"
+      done={imagenLista}
+    />
+  );
+
   return (
-    <Card title="2. Vista previa">
+    <Card title="2. Vista previa" trailing={estadoImagen}>
       <View style={styles.contenedor}>
         {imageUri ? <ImagenCargada uri={imageUri} onQuitar={onQuitar} /> : <Vacio />}
       </View>

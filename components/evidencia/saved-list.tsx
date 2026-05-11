@@ -1,9 +1,19 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { EVIDENCIA_COLORS } from '@/constants/evidencia-theme';
 import type { EvidenciaGuardada } from '@/lib/evidencia-storage';
 import { Card } from './card';
+import { EvidenciaDetailModal } from './evidencia-detail-modal';
 
 type Props = {
   evidencias: EvidenciaGuardada[];
@@ -12,6 +22,8 @@ type Props = {
 };
 
 export function SavedList({ evidencias, cargando, onEliminar }: Props) {
+  const [detalle, setDetalle] = useState<EvidenciaGuardada | null>(null);
+
   const trailing = (
     <Text style={styles.contador}>
       {evidencias.length} {evidencias.length === 1 ? 'guardada' : 'guardadas'}
@@ -28,8 +40,20 @@ export function SavedList({ evidencias, cargando, onEliminar }: Props) {
           y tocá &quot;Guardar evidencia&quot;.
         </Text>
       ) : (
-        evidencias.map((ev) => <SavedItem key={ev.id} evidencia={ev} onEliminar={onEliminar} />)
+        evidencias.map((ev) => (
+          <SavedItem
+            key={ev.id}
+            evidencia={ev}
+            onEliminar={onEliminar}
+            onVerDetalle={() => setDetalle(ev)}
+          />
+        ))
       )}
+      <EvidenciaDetailModal
+        evidencia={detalle}
+        visible={detalle !== null}
+        onClose={() => setDetalle(null)}
+      />
     </Card>
   );
 }
@@ -37,22 +61,46 @@ export function SavedList({ evidencias, cargando, onEliminar }: Props) {
 function SavedItem({
   evidencia,
   onEliminar,
+  onVerDetalle,
 }: {
   evidencia: EvidenciaGuardada;
   onEliminar: (id: string) => void;
+  onVerDetalle: () => void;
 }) {
+  const solicitarEliminar = () => {
+    Alert.alert(
+      'Eliminar evidencia',
+      '¿Seguro que querés eliminar este registro? Esta acción no se puede deshacer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => onEliminar(evidencia.id),
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.item}>
-      <Image source={{ uri: evidencia.imageUri }} style={styles.thumb} resizeMode="cover" />
-      <View style={styles.itemBody}>
-        <Text style={styles.observacion} numberOfLines={3}>
-          {evidencia.observacion}
-        </Text>
-        <Text style={styles.fecha}>{formatearFecha(evidencia.fecha)}</Text>
-      </View>
+      <Pressable
+        style={styles.itemMain}
+        onPress={onVerDetalle}
+        accessibilityRole="button"
+        accessibilityLabel="Ver detalle de la evidencia"
+      >
+        <Image source={{ uri: evidencia.imageUri }} style={styles.thumb} resizeMode="cover" />
+        <View style={styles.itemBody}>
+          <Text style={styles.observacion} numberOfLines={3}>
+            {evidencia.observacion}
+          </Text>
+          <Text style={styles.fecha}>{formatearFecha(evidencia.fecha)}</Text>
+        </View>
+      </Pressable>
       <TouchableOpacity
         style={styles.btnEliminar}
-        onPress={() => onEliminar(evidencia.id)}
+        onPress={solicitarEliminar}
         activeOpacity={0.7}
         accessibilityLabel="Eliminar evidencia"
       >
@@ -89,10 +137,17 @@ const styles = StyleSheet.create({
   },
   item: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: 12,
     paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: EVIDENCIA_COLORS.border,
+  },
+  itemMain: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
+    minWidth: 0,
   },
   thumb: {
     width: 64,

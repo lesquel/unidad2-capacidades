@@ -36,10 +36,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 10,
   },
   title: {
+    flexShrink: 1,
     fontSize: 14,
     fontWeight: '700',
     color: EVIDENCIA_COLORS.text,

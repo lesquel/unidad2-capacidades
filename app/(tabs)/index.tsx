@@ -13,12 +13,10 @@ import { EvidenciaHeader } from '@/components/evidencia/evidencia-header';
 import { ImagePreview } from '@/components/evidencia/image-preview';
 import { ObservationInput } from '@/components/evidencia/observation-input';
 import { SaveButton } from '@/components/evidencia/save-button';
-import { SavedList } from '@/components/evidencia/saved-list';
-import { StatusRow } from '@/components/evidencia/status-row';
 import { CONTENT_MAX_WIDTH, EVIDENCIA_COLORS } from '@/constants/evidencia-theme';
-import { useEvidencia } from '@/hooks/use-evidencia';
+import { useEvidencia } from '@/context/evidencia-context';
 
-export default function RegistroEvidenciaScreen() {
+export default function NuevaEvidenciaScreen() {
   const evidencia = useEvidencia();
 
   return (
@@ -32,37 +30,30 @@ export default function RegistroEvidenciaScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
         >
           <View style={styles.container}>
             <EvidenciaHeader />
-
-            <StatusRow
-              tieneImagen={evidencia.tieneImagen}
-              tieneObservacion={evidencia.tieneObservacion}
-            />
 
             <CaptureActions
               onTomarFoto={evidencia.abrirCamara}
               onSeleccionarImagen={evidencia.seleccionarImagen}
             />
 
-            <ImagePreview imageUri={evidencia.imageUri} onQuitar={evidencia.quitarImagen} />
+            <ImagePreview
+              imageUri={evidencia.imageUri}
+              onQuitar={evidencia.quitarImagen}
+              imagenLista={evidencia.tieneImagen}
+            />
 
             <ObservationInput
               value={evidencia.observacion}
               max={evidencia.observacionMax}
               onChange={evidencia.setObservacion}
+              observacionLista={evidencia.tieneObservacion}
             />
 
             <SaveButton onPress={evidencia.guardar} />
-
-            <View style={styles.spacer} />
-
-            <SavedList
-              evidencias={evidencia.evidencias}
-              cargando={evidencia.cargandoLista}
-              onEliminar={evidencia.eliminarEvidencia}
-            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -89,8 +80,5 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: CONTENT_MAX_WIDTH,
     alignSelf: 'center',
-  },
-  spacer: {
-    height: 24,
   },
 });
