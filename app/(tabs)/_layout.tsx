@@ -49,6 +49,15 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="ubicacion"
+          options={{
+            title: 'Ubicación',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="location-outline" size={size} color={color} />
+            ),
+          }}
+        />
       </Tabs>
     </EvidenciaProvider>
   );

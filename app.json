@@ -40,8 +40,13 @@
         }
       ],
       "expo-font",
-      "expo-image",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Esta app usa tu ubicación para mostrar las coordenadas actuales del dispositivo."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
